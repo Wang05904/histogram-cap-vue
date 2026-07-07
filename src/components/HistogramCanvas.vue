@@ -1,8 +1,22 @@
 <template>
-  <el-card class="histogram-card" shadow="hover">
+  <el-card class="histogram-card" shadow="never">
     <template #header>
       <div class="card-header">
-        <span>灰度直方图</span>
+        <div class="header-left">
+          <div class="header-icon">
+            📊
+          </div>
+          <div>
+            <div class="title">灰度直方图</div>
+            <div class="subtitle">
+              Histogram Analysis
+            </div>
+          </div>
+        </div>
+
+        <el-tag round effect="plain" type="primary">
+          256 Bins
+        </el-tag>
       </div>
     </template>
 
@@ -16,10 +30,6 @@
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 interface Props {
-  /**
-   * 长度固定256
-   * 数据已经归一化到0~100
-   */
   histogram: number[]
 }
 
@@ -32,36 +42,22 @@ let resizeObserver: ResizeObserver | null = null
 
 const CANVAS_HEIGHT = 320
 
-/**
- * 重绘
- */
 function draw() {
 
   const canvas = canvasRef.value
-
   const wrapper = wrapperRef.value
 
-  if (!canvas || !wrapper) {
-
-    return
-
-  }
+  if (!canvas || !wrapper) return
 
   const width = wrapper.clientWidth
-
   const height = CANVAS_HEIGHT
 
   canvas.width = width
-
   canvas.height = height
 
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext("2d")
 
-  if (!ctx) {
-
-    return
-
-  }
+  if (!ctx) return
 
   //--------------------------------
   // 背景
@@ -69,16 +65,14 @@ function draw() {
 
   ctx.clearRect(0, 0, width, height)
 
-  ctx.fillStyle = "#ffffff"
-
+  ctx.fillStyle = "#fafafa"
   ctx.fillRect(0, 0, width, height)
 
   //--------------------------------
   // 网格
   //--------------------------------
 
-  ctx.strokeStyle = "#eeeeee"
-
+  ctx.strokeStyle = "#ececec"
   ctx.lineWidth = 1
 
   for (let i = 0; i <= 10; i++) {
@@ -86,11 +80,8 @@ function draw() {
     const y = i * height / 10
 
     ctx.beginPath()
-
     ctx.moveTo(0, y)
-
     ctx.lineTo(width, y)
-
     ctx.stroke()
 
   }
@@ -99,17 +90,14 @@ function draw() {
   // 坐标轴
   //--------------------------------
 
-  ctx.strokeStyle = "#222"
-
+  ctx.strokeStyle = "#666"
   ctx.lineWidth = 2
 
   ctx.beginPath()
 
-  ctx.moveTo(35, 10)
-
-  ctx.lineTo(35, height - 25)
-
-  ctx.lineTo(width - 10, height - 25)
+  ctx.moveTo(40, 10)
+  ctx.lineTo(40, height - 30)
+  ctx.lineTo(width - 10, height - 30)
 
   ctx.stroke()
 
@@ -117,17 +105,24 @@ function draw() {
   // 柱状图
   //--------------------------------
 
-  const left = 35
-
-  const bottom = height - 25
-
+  const left = 40
+  const bottom = height - 30
   const chartWidth = width - left - 10
-
-  const chartHeight = height - 35
+  const chartHeight = height - 40
 
   const barWidth = chartWidth / 256
 
-  ctx.fillStyle = "#000"
+  const gradient = ctx.createLinearGradient(
+      0,
+      bottom,
+      0,
+      0
+  )
+
+  gradient.addColorStop(0, "#79bbff")
+  gradient.addColorStop(1, "#409EFF")
+
+  ctx.fillStyle = gradient
 
   for (let i = 0; i < 256; i++) {
 
@@ -145,11 +140,10 @@ function draw() {
   }
 
   //--------------------------------
-  // X轴刻度
+  // X轴
   //--------------------------------
 
-  ctx.fillStyle = "#666"
-
+  ctx.fillStyle = "#888"
   ctx.font = "12px Arial"
 
   for (let i = 0; i <= 8; i++) {
@@ -161,13 +155,13 @@ function draw() {
     ctx.fillText(
         String(value),
         x - 8,
-        height - 5
+        height - 8
     )
 
   }
 
   //--------------------------------
-  // Y轴刻度
+  // Y轴
   //--------------------------------
 
   for (let i = 0; i <= 5; i++) {
@@ -227,39 +221,99 @@ onBeforeUnmount(() => {
 
 <style scoped>
 
-.histogram-card{
+.histogram-card {
 
-  width:100%;
+  width: 100%;
 
-}
+  border: none;
 
-.card-header{
+  border-radius: 20px;
 
-  font-size:18px;
+  overflow: hidden;
 
-  font-weight:600;
-
-}
-
-.canvas-wrapper{
-
-  width:100%;
-
-  overflow:hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,.06);
 
 }
 
-canvas{
+.card-header {
 
-  width:100%;
+  display: flex;
 
-  height:320px;
+  justify-content: space-between;
 
-  display:block;
+  align-items: center;
 
-  border-radius:8px;
+}
 
-  border:1px solid #e5e5e5;
+.header-left {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+}
+
+.header-icon {
+
+  width: 46px;
+
+  height: 46px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(135deg,#409EFF,#66b1ff);
+
+  color: white;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  font-size: 22px;
+
+}
+
+.title {
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #303133;
+
+}
+
+.subtitle {
+
+  margin-top: 4px;
+
+  font-size: 13px;
+
+  color: #909399;
+
+}
+
+.canvas-wrapper {
+
+  width: 100%;
+
+}
+
+canvas {
+
+  width: 100%;
+
+  height: 320px;
+
+  display: block;
+
+  border-radius: 14px;
+
+  background: #fafafa;
 
 }
 

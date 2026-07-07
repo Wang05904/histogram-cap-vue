@@ -1,8 +1,19 @@
 <template>
-  <el-card shadow="hover" class="uploader-card">
+  <el-card shadow="never" class="uploader-card">
 
     <template #header>
-      <span>图片上传</span>
+      <div class="card-header">
+        <div>
+          <div class="title">上传图片</div>
+          <div class="sub-title">
+            Upload Image
+          </div>
+        </div>
+
+        <el-tag round effect="plain">
+          Image
+        </el-tag>
+      </div>
     </template>
 
     <div
@@ -12,20 +23,24 @@
         @drop.prevent="onDrop"
     >
 
+      <!-- 未上传 -->
       <template v-if="!previewUrl">
 
-        <el-icon :size="60">
-          <Plus/>
-        </el-icon>
+        <div class="upload-icon">
+          <el-icon :size="50">
+            <Plus />
+          </el-icon>
+        </div>
 
-        <p>点击上传图片</p>
+        <h3>点击或拖拽上传图片</h3>
 
-        <small>
-          支持 jpg png jpeg bmp webp
-        </small>
+        <p>
+          支持 JPG、PNG、JPEG、BMP、WEBP
+        </p>
 
       </template>
 
+      <!-- 已上传 -->
       <template v-else>
 
         <img
@@ -45,16 +60,17 @@
 
       <el-button
           type="primary"
+          round
           @click="selectImage"
       >
         更换图片
       </el-button>
 
       <el-button
-          type="danger"
+          round
           @click="removeImage"
       >
-        删除
+        删除图片
       </el-button>
 
     </div>
@@ -62,8 +78,8 @@
     <input
         ref="inputRef"
         type="file"
-        accept="image/*"
         hidden
+        accept="image/*"
         @change="onSelect"
     />
 
@@ -71,68 +87,57 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onBeforeUnmount } from "vue"
+import { Plus } from "@element-plus/icons-vue"
+import { ElMessage } from "element-plus"
 
-import {ref, onBeforeUnmount} from 'vue'
+interface ImagePayload {
 
-import {Plus} from '@element-plus/icons-vue'
+  url: string
 
-import {ElMessage} from 'element-plus'
-
-interface ImagePayload{
-
-  url:string
-
-  file:File
+  file: File
 
 }
 
-const emit=defineEmits<{
+const emit = defineEmits<{
 
-  (e:"image-selected",payload:ImagePayload):void
+  (e: "image-selected", payload: ImagePayload): void
 
 }>()
 
-const inputRef=ref<HTMLInputElement>()
+const inputRef = ref<HTMLInputElement>()
 
-const previewUrl=ref("")
+const previewUrl = ref("")
 
-let currentFile:File|null=null
+let currentFile: File | null = null
 
-function selectImage(){
+function selectImage() {
 
   inputRef.value?.click()
 
 }
 
-function onSelect(event:Event){
+function onSelect(event: Event) {
 
-  const target=event.target as HTMLInputElement
+  const target = event.target as HTMLInputElement
 
-  if(!target.files?.length){
-
-    return
-
-  }
+  if (!target.files?.length) return
 
   loadFile(target.files[0])
 
 }
 
-function onDrop(event:DragEvent){
+function onDrop(event: DragEvent) {
 
-  if(!event.dataTransfer?.files.length){
-
-    return
-
-  }
+  if (!event.dataTransfer?.files.length) return
 
   loadFile(event.dataTransfer.files[0])
 
 }
 
-function loadFile(file:File){
+function loadFile(file: File) {
 
-  if(!file.type.startsWith("image")){
+  if (!file.type.startsWith("image")) {
 
     ElMessage.error("请选择图片")
 
@@ -140,19 +145,19 @@ function loadFile(file:File){
 
   }
 
-  if(previewUrl.value){
+  if (previewUrl.value) {
 
     URL.revokeObjectURL(previewUrl.value)
 
   }
 
-  previewUrl.value=URL.createObjectURL(file)
+  previewUrl.value = URL.createObjectURL(file)
 
-  currentFile=file
+  currentFile = file
 
-  emit("image-selected",{
+  emit("image-selected", {
 
-    url:previewUrl.value,
+    url: previewUrl.value,
 
     file
 
@@ -160,113 +165,174 @@ function loadFile(file:File){
 
 }
 
-function removeImage(){
+function removeImage() {
 
-  if(previewUrl.value){
+  if (previewUrl.value) {
 
     URL.revokeObjectURL(previewUrl.value)
 
   }
 
-  previewUrl.value=""
+  previewUrl.value = ""
 
-  currentFile=null
+  currentFile = null
 
-  if(inputRef.value){
+  if (inputRef.value) {
 
-    inputRef.value.value=""
+    inputRef.value.value = ""
 
   }
 
 }
 
-onBeforeUnmount(()=>{
+onBeforeUnmount(() => {
 
-  if(previewUrl.value){
+  if (previewUrl.value) {
 
     URL.revokeObjectURL(previewUrl.value)
 
   }
 
 })
-
 </script>
 
 <style scoped>
 
-.uploader-card{
+.uploader-card {
 
-  width:100%;
+  border-radius: 22px;
 
-}
+  border: none;
 
-.upload-area{
-
-  width:100%;
-
-  height:320px;
-
-  border:2px dashed #409EFF;
-
-  border-radius:14px;
-
-  display:flex;
-
-  flex-direction:column;
-
-  justify-content:center;
-
-  align-items:center;
-
-  cursor:pointer;
-
-  transition:.25s;
-
-  overflow:hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,.06);
 
 }
 
-.upload-area:hover{
+.card-header {
 
-  background:#ecf5ff;
+  display: flex;
 
-}
+  justify-content: space-between;
 
-.preview{
-
-  width:100%;
-
-  height:100%;
-
-  object-fit:contain;
+  align-items: center;
 
 }
 
-p{
+.title {
 
-  margin-top:15px;
+  font-size: 18px;
 
-  font-size:18px;
-
-}
-
-small{
-
-  margin-top:10px;
-
-  color:#999;
+  font-weight: 600;
 
 }
 
-.buttons{
+.sub-title {
 
-  display:flex;
+  margin-top: 4px;
 
-  justify-content:center;
+  color: #909399;
 
-  margin-top:18px;
+  font-size: 13px;
 
-  gap:15px;
+}
+
+.upload-area {
+
+  height: 340px;
+
+  border: 2px dashed #409EFF;
+
+  border-radius: 18px;
+
+  background: #fafcff;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  transition: .25s;
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+}
+
+.upload-area:hover {
+
+  border-color: #66b1ff;
+
+  background: #ecf5ff;
+
+}
+
+.upload-icon {
+
+  width: 90px;
+
+  height: 90px;
+
+  border-radius: 50%;
+
+  background: #409EFF;
+
+  color: white;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  margin-bottom: 20px;
+
+}
+
+h3 {
+
+  margin: 0;
+
+  font-size: 20px;
+
+  font-weight: 600;
+
+  color: #303133;
+
+}
+
+p {
+
+  margin-top: 12px;
+
+  color: #909399;
+
+}
+
+.preview {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: contain;
+
+  padding: 12px;
+
+}
+
+.buttons {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 18px;
+
+  margin-top: 20px;
 
 }
 
