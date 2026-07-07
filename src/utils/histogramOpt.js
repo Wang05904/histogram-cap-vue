@@ -6,78 +6,126 @@ import {
 
 const DEFAULT_CONFIG = {
   grayMode: 'floatGray',
-  loopMode: 'unrolledLoop',
+  grayStrategy: 'directGray',
+  loopMode: 'unroll4',
   dataMode: 'histTypedArray',
   threadMode: 'mainThread'
 }
 
 export const FASTEST_KNOWN_CONFIG = {
   grayMode: 'floatGray',
-  loopMode: 'unrolledLoop',
+  grayStrategy: 'directGray',
+  loopMode: 'unroll4',
   dataMode: 'histTypedArray',
   threadMode: 'mainThread'
 }
+
+const GRAY_TABLES = (() => {
+  const r = new Float64Array(256)
+  const g = new Float64Array(256)
+  const b = new Float64Array(256)
+
+  for (let i = 0; i < 256; i++) {
+    r[i] = i * 0.299
+    g[i] = i * 0.587
+    b[i] = i * 0.114
+  }
+
+  return { r, g, b }
+})()
 
 function now() {
   return typeof performance !== 'undefined' ? performance.now() : Date.now()
 }
 
 function buildAlgorithmName(config) {
-  return [
+  const parts = [
     config.threadMode,
-    config.grayMode,
+    config.grayStrategy || 'directGray',
     config.loopMode,
     config.dataMode
-  ].join('-')
+  ]
+
+  if (config.chunkSize) {
+    parts.push(`chunk${config.chunkSize}`)
+  }
+
+  if (config.workerCount) {
+    parts.push(`workers${config.workerCount}`)
+  }
+
+  return parts.join('-')
 }
 
 function createBins(dataMode) {
   return dataMode === 'histArray' ? new Array(256).fill(0) : new Uint32Array(256)
 }
 
-function getGray(data, i, grayMode) {
+function getGray(data, i, grayStrategy) {
   const r = data[i]
   const g = data[i + 1]
   const b = data[i + 2]
 
-  if (grayMode === 'intGray') {
-    return (77 * r + 150 * g + 29 * b) >> 8
+  if (grayStrategy === 'lookupGray') {
+    return Math.round(GRAY_TABLES.r[r] + GRAY_TABLES.g[g] + GRAY_TABLES.b[b])
   }
 
   return Math.round(r * 0.299 + g * 0.587 + b * 0.114)
 }
 
-function computeNormalLoop(data, bins, grayMode) {
+function addPixel(data, bins, i, grayStrategy) {
+  bins[getGray(data, i, grayStrategy)]++
+}
+
+function computeNormalLoop(data, bins, grayStrategy) {
   for (let i = 0; i < data.length; i += 4) {
-    bins[getGray(data, i, grayMode)]++
+    addPixel(data, bins, i, grayStrategy)
   }
 }
 
-function computeUnrolledLoop(data, bins, grayMode) {
-  const limit = data.length - 15
+function computeUnrolledLoop(data, bins, grayStrategy, pixelStep) {
+  const byteStep = pixelStep * 4
+  const limit = data.length - byteStep + 1
   let i = 0
 
-  for (; i <= limit; i += 16) {
-    bins[getGray(data, i, grayMode)]++
-    bins[getGray(data, i + 4, grayMode)]++
-    bins[getGray(data, i + 8, grayMode)]++
-    bins[getGray(data, i + 12, grayMode)]++
+  for (; i <= limit; i += byteStep) {
+    for (let offset = 0; offset < byteStep; offset += 4) {
+      addPixel(data, bins, i + offset, grayStrategy)
+    }
   }
 
   for (; i < data.length; i += 4) {
-    bins[getGray(data, i, grayMode)]++
+    addPixel(data, bins, i, grayStrategy)
   }
+}
+
+function loopPixelStep(loopMode) {
+  if (loopMode === 'unroll2') {
+    return 2
+  }
+
+  if (loopMode === 'unroll8') {
+    return 8
+  }
+
+  if (loopMode === 'unrolledLoop' || loopMode === 'unroll4') {
+    return 4
+  }
+
+  return 1
 }
 
 function computeMainThread(imageData, config) {
   const start = now()
   const bins = createBins(config.dataMode)
   const data = imageData.data
+  const pixelStep = loopPixelStep(config.loopMode)
+  const grayStrategy = config.grayStrategy || 'directGray'
 
-  if (config.loopMode === 'unrolledLoop') {
-    computeUnrolledLoop(data, bins, config.grayMode)
+  if (pixelStep > 1) {
+    computeUnrolledLoop(data, bins, grayStrategy, pixelStep)
   } else {
-    computeNormalLoop(data, bins, config.grayMode)
+    computeNormalLoop(data, bins, grayStrategy)
   }
 
   return {
@@ -125,7 +173,10 @@ async function computeMultiWorker(imageData, config) {
   }
 
   const pixelCount = imageData.width * imageData.height
-  const maxWorkers = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 2) - 1))
+  const requestedWorkers =
+    config.workerCount ||
+    (config.threadMode === 'fixed2Worker' ? 2 : config.threadMode === 'fixed4Worker' ? 4 : 0)
+  const maxWorkers = requestedWorkers || Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 2) - 1))
   const workerCount = Math.min(maxWorkers, Math.max(1, Math.floor(pixelCount / 65536)))
 
   if (workerCount <= 1) {
@@ -195,7 +246,11 @@ export async function runOptimizedHistogram(imageData, options = {}) {
 
   if (config.threadMode === 'singleWorker' || config.threadMode === 'chunkWorker') {
     computed = await computeSingleWorker(imageData, config)
-  } else if (config.threadMode === 'multiWorker') {
+  } else if (
+    config.threadMode === 'multiWorker' ||
+    config.threadMode === 'fixed2Worker' ||
+    config.threadMode === 'fixed4Worker'
+  ) {
     computed = await computeMultiWorker(imageData, config)
   } else {
     computed = computeMainThread(imageData, config)
@@ -227,15 +282,32 @@ export async function runOptimizedHistogram(imageData, options = {}) {
   }
 }
 
-export async function runFastestHistogram(imageData) {
+export async function runFastestHistogram(imageData, options = {}) {
   const baseline = runBaseHistogram(imageData)
-  const result = await runOptimizedHistogram(imageData, FASTEST_KNOWN_CONFIG)
+  const module = await import('./histogramBenchmark.js')
+  const rows = await module.benchmarkHistogramAlgorithms(
+    [{ name: options.name || 'Current Image', imageData }],
+    { runs: options.runs || 5, configs: options.configs }
+  )
+  const best = module.chooseBestAlgorithm(rows)
+
+  if (!best) {
+    throw new Error('No exact histogram algorithm matched the baseline')
+  }
+
+  const result = await runOptimizedHistogram(imageData, best.config)
   const accuracy = compareHistogramBins(result.bins, baseline.bins)
 
   return {
     ...result,
     passed300ms: result.timing.totalMs < 300,
     accuracy,
+    selectionReason:
+      'Selected from exact benchmark candidates for the current image; histArray and non-retained variants are benchmark-only.',
+    benchmarkSummary: {
+      selectedAverageMs: best.timing.totalMs,
+      candidateCount: rows.filter((row) => row.autoCandidate).length
+    },
     histogram: {
       bins: Array.from(result.bins),
       normalizedBins: Array.from(result.normalizedBins)

@@ -23,67 +23,120 @@ export const TEST_IMAGE_PATHS = [
 export const BENCHMARK_CONFIGS = [
   {
     grayMode: 'floatGray',
+    grayStrategy: 'directGray',
     loopMode: 'normalLoop',
     dataMode: 'histArray',
-    threadMode: 'mainThread'
+    threadMode: 'mainThread',
+    benchmarkOnly: true
   },
   {
     grayMode: 'floatGray',
+    grayStrategy: 'directGray',
     loopMode: 'normalLoop',
     dataMode: 'histTypedArray',
     threadMode: 'mainThread'
   },
   {
     grayMode: 'floatGray',
-    loopMode: 'skipAlpha',
+    grayStrategy: 'lookupGray',
+    loopMode: 'normalLoop',
     dataMode: 'histTypedArray',
     threadMode: 'mainThread'
   },
   {
     grayMode: 'floatGray',
-    loopMode: 'unrolledLoop',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll2',
+    dataMode: 'histTypedArray',
+    threadMode: 'mainThread',
+    benchmarkOnly: true
+  },
+  {
+    grayMode: 'floatGray',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
     dataMode: 'histTypedArray',
     threadMode: 'mainThread'
   },
   {
-    grayMode: 'intGray',
-    loopMode: 'unrolledLoop',
+    grayMode: 'floatGray',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll8',
+    dataMode: 'histTypedArray',
+    threadMode: 'mainThread',
+    benchmarkOnly: true
+  },
+  {
+    grayMode: 'floatGray',
+    grayStrategy: 'lookupGray',
+    loopMode: 'unroll4',
     dataMode: 'histTypedArray',
     threadMode: 'mainThread'
   },
   {
     grayMode: 'floatGray',
-    loopMode: 'unrolledLoop',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
     dataMode: 'histTypedArray',
-    threadMode: 'singleWorker'
+    threadMode: 'mainThread',
+    includeImageData: true,
+    benchmarkOnly: true
   },
   {
     grayMode: 'floatGray',
-    loopMode: 'unrolledLoop',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
     dataMode: 'histTypedArray',
-    threadMode: 'chunkWorker'
+    threadMode: 'singleWorker',
+    benchmarkOnly: true
   },
   {
     grayMode: 'floatGray',
-    loopMode: 'unrolledLoop',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
     dataMode: 'histTypedArray',
-    threadMode: 'multiWorker'
+    threadMode: 'chunkWorker',
+    chunkSize: 32768,
+    benchmarkOnly: true
   },
   {
-    grayMode: 'intGray',
-    loopMode: 'unrolledLoop',
+    grayMode: 'floatGray',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
     dataMode: 'histTypedArray',
-    threadMode: 'multiWorker'
+    threadMode: 'chunkWorker',
+    chunkSize: 262144,
+    benchmarkOnly: true
+  },
+  {
+    grayMode: 'floatGray',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
+    dataMode: 'histTypedArray',
+    threadMode: 'fixed2Worker',
+    workerCount: 2,
+    benchmarkOnly: true
+  },
+  {
+    grayMode: 'floatGray',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
+    dataMode: 'histTypedArray',
+    threadMode: 'fixed4Worker',
+    workerCount: 4
   }
 ]
 
 function algorithmName(config) {
   return [
     config.threadMode,
-    config.grayMode,
+    config.grayStrategy || 'directGray',
     config.loopMode,
-    config.dataMode
-  ].join('-')
+    config.dataMode,
+    config.chunkSize ? `chunk${config.chunkSize}` : '',
+    config.workerCount ? `workers${config.workerCount}` : '',
+    config.includeImageData ? 'withImageData' : ''
+  ].filter(Boolean).join('-')
 }
 
 function average(values) {
@@ -184,6 +237,7 @@ export async function benchmarkHistogramAlgorithms(imageDataList = TEST_IMAGE_PA
         withinTolerance: accuracy.withinTolerance,
         maxBinDiff: accuracy.maxBinDiff,
         totalDiff: accuracy.totalDiff,
+        autoCandidate: !config.benchmarkOnly && accuracy.sameAsBaseline,
         config,
         lastTiming: lastResult.timing
       })
@@ -215,7 +269,7 @@ export function chooseBestAlgorithm(results, options = {}) {
   }
 
   const candidates = Array.from(grouped.values())
-    .filter((group) => group.allWithinTolerance)
+    .filter((group) => group.allExact && !group.config.benchmarkOnly)
     .map((group) => {
       const computeMs = roundMs(average(group.rows.map((row) => row.computeMs)))
       const normalizeMs = roundMs(average(group.rows.map((row) => row.normalizeMs)))
@@ -264,9 +318,7 @@ export function chooseBestAlgorithm(results, options = {}) {
     passed300ms: best.passed300ms,
     accuracy: best.accuracy,
     note:
-      best.config.grayMode === 'intGray'
-        ? 'intGray is an integer approximation of the standard grayscale formula and may have small bin differences.'
-        : 'Exact float grayscale result.'
+      'All automatic candidates use the required exact grayscale formula and match the baseline bins exactly.'
   }
 }
 

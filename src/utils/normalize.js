@@ -23,10 +23,7 @@ export function computeHistogram(imageData, algorithm = 'realtime') {
     const r = data[i]
     const g = data[i + 1]
     const b = data[i + 2]
-    const gray =
-      algorithm === 'int'
-        ? (77 * r + 150 * g + 29 * b) >> 8
-        : Math.round(r * 0.299 + g * 0.587 + b * 0.114)
+    const gray = Math.round(r * 0.299 + g * 0.587 + b * 0.114)
 
     histogram[gray]++
   }

@@ -1,335 +1,99 @@
 <template>
-  <div class="about-page">
-
-    <!-- 顶部 -->
-    <AppHeader/>
-
-    <!-- 灰度公式 -->
-    <el-card class="card" shadow="hover">
-
-      <template #header>
-
-        <span>📖 灰度计算公式</span>
-
-      </template>
-
-      <div class="formula">
-
-        Gray = R × 0.299 + G × 0.587 + B × 0.114
-
-      </div>
-
-      <p class="description">
-
-        根据 RGB 三个颜色通道按加权平均计算灰度值，其中绿色对亮度贡献最大，
-        蓝色贡献最小，因此采用加权方式能够更符合人眼视觉感知。
-
-      </p>
-
-    </el-card>
-
-    <!-- 算法比较 -->
-    <el-card class="card" shadow="hover">
-
-      <template #header>
-
-        <span>⚙ 两种统计方式</span>
-
-      </template>
-
-      <el-table
-          :data="algorithmTable"
-          border
-          stripe
-      >
-
-        <el-table-column
-            prop="name"
-            label="算法"
-        />
-
-        <el-table-column
-            prop="feature"
-            label="特点"
-        />
-
-      </el-table>
-
-    </el-card>
-
-    <!-- 复杂度 -->
-    <el-card class="card" shadow="hover">
-
-      <template #header>
-
-        <span>📊 时间复杂度</span>
-
-      </template>
-
-      <el-descriptions
-          :column="1"
-          border
-      >
-
-        <el-descriptions-item label="时间复杂度">
-
-          O(n)
-
-        </el-descriptions-item>
-
-        <el-descriptions-item label="空间复杂度">
-
-          O(256)
-
-        </el-descriptions-item>
-
-        <el-descriptions-item label="统计方式">
-
-          单次遍历所有像素
-
-        </el-descriptions-item>
-
-      </el-descriptions>
-
-    </el-card>
-
-    <!-- 流程 -->
-    <el-card class="card" shadow="hover">
-
-      <template #header>
-
-        <span>🔄 算法流程</span>
-
-      </template>
-
-      <div class="flow">
-
-        <div class="step">
-
-          上传图片
-
-        </div>
-
-        <div class="arrow">
-
-          ↓
-
-        </div>
-
-        <div class="step">
-
-          读取 RGB
-
-        </div>
-
-        <div class="arrow">
-
-          ↓
-
-        </div>
-
-        <div class="step">
-
-          计算灰度值
-
-        </div>
-
-        <div class="arrow">
-
-          ↓
-
-        </div>
-
-        <div class="step">
-
-          更新 Histogram
-
-        </div>
-
-        <div class="arrow">
-
-          ↓
-
-        </div>
-
-        <div class="step">
-
-          输出统计结果
-
-        </div>
-
-      </div>
-
-    </el-card>
-
-    <!-- 项目信息 -->
-    <el-card class="card" shadow="hover">
-
-      <template #header>
-
-        <span>ℹ 项目信息</span>
-
-      </template>
-
-      <el-descriptions
-          :column="1"
-          border
-      >
-
-        <el-descriptions-item label="项目">
-
-          图像直方图计算系统
-
-        </el-descriptions-item>
-
-        <el-descriptions-item label="前端">
-
-          Vue 3 + Vite + Element Plus
-
-        </el-descriptions-item>
-
-        <el-descriptions-item label="统计">
-
-          Canvas + JavaScript
-
-        </el-descriptions-item>
-
-      </el-descriptions>
-
-    </el-card>
-
+  <div class="page">
+    <AppHeader />
+
+    <section class="notes-grid">
+      <el-card class="note-card" shadow="never">
+        <template #header>
+          <div class="title">精确灰度公式</div>
+        </template>
+        <p class="formula">gray = Math.round(r * 0.299 + g * 0.587 + b * 0.114)</p>
+        <p>
+          基准算法与默认精确算法均使用该加权灰度公式，确保结果可校验。
+        </p>
+      </el-card>
+
+      <el-card class="note-card" shadow="never">
+        <template #header>
+          <div class="title">默认演示算法</div>
+        </template>
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="灰度">floatGray</el-descriptions-item>
+          <el-descriptions-item label="遍历">unrolledLoop</el-descriptions-item>
+          <el-descriptions-item label="数据结构">histTypedArray</el-descriptions-item>
+          <el-descriptions-item label="线程">mainThread</el-descriptions-item>
+        </el-descriptions>
+      </el-card>
+
+      <el-card class="note-card wide" shadow="never">
+        <template #header>
+          <div class="title">输出数据接口</div>
+        </template>
+        <ul>
+          <li>原始 bins：256 个灰度频次。</li>
+          <li>归一化 bins：256 个 0-100 范围内的高度值。</li>
+          <li>渲染数据：可选的 256 x 100 黑白 ImageData。</li>
+          <li>耗时字段：计算、归一化、数据生成、渲染和总耗时。</li>
+        </ul>
+      </el-card>
+    </section>
   </div>
 </template>
 
 <script setup>
-
-import { useRouter } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
-
-const router = useRouter()
-
-const algorithmTable = [
-
-  {
-
-    name: '优先灰度化',
-
-    feature: '先转换为灰度图，再统计直方图，实现简单。'
-
-  },
-
-  {
-
-    name: '统计时灰度化',
-
-    feature: '边读取 RGB 边统计灰度值，只遍历一次，效率更高。'
-
-  }
-
-]
-
 </script>
 
 <style scoped>
-
-.about-page{
-
-  min-height:100vh;
-
-  background:#f5f7fa;
-
-  padding:24px;
-
+.page {
+  min-height: 100vh;
+  padding: 24px;
+  background: #f3f4f6;
 }
 
-
-
-.card{
-
-  margin-bottom:20px;
-
-  border-radius:18px;
-
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }
 
-.formula{
-
-  text-align:center;
-
-  font-size:24px;
-
-  font-weight:700;
-
-  color:#409EFF;
-
-  margin:20px 0;
-
+.note-card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
 }
 
-.description{
-
-  color:#606266;
-
-  line-height:1.8;
-
+.wide {
+  grid-column: 1 / -1;
 }
 
-.flow{
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
+.title {
+  color: #1f2937;
+  font-size: 18px;
+  font-weight: 700;
 }
 
-.step{
-
-  width:220px;
-
-  padding:14px;
-
-  text-align:center;
-
-  background:#ecf5ff;
-
-  border-radius:12px;
-
-  font-weight:600;
-
+p,
+li {
+  color: #4b5563;
+  line-height: 1.7;
 }
 
-.arrow{
-
-  font-size:24px;
-
-  margin:8px 0;
-
-  color:#409EFF;
-
+.formula {
+  padding: 12px;
+  border-radius: 8px;
+  background: #f9fafb;
+  color: #111827;
+  font-family: Consolas, monospace;
 }
 
-@media(max-width:768px){
-
-  .about-page{
-
-    padding:16px;
-
+@media (max-width: 800px) {
+  .page {
+    padding: 16px;
   }
 
-  .formula{
-
-    font-size:18px;
-
+  .notes-grid {
+    grid-template-columns: 1fr;
   }
-
-  .step{
-
-    width:100%;
-
-  }
-
 }
-
 </style>
