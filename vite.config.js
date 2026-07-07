@@ -11,5 +11,16 @@ export default defineConfig({
     alias: {
       '@': '/src'
     }
+  },
+  test: {
+    globals: true,
+    environment: 'node',
+    include: ['src/**/*.{test,spec}.{js,ts}'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
+      include: ['src/utils/**/*.js'],
+      exclude: ['src/utils/__tests__/**']
+    }
   }
 })
