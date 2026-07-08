@@ -4,7 +4,6 @@
       <div class="brand-mark">H</div>
       <div>
         <h1>图像直方图性能分析系统</h1>
-        <p>Vue 3 + Vite + Capacitor 移动端演示</p>
       </div>
     </div>
 
@@ -77,12 +76,6 @@ h1 {
   font-size: 28px;
   font-weight: 800;
   letter-spacing: 0;
-}
-
-p {
-  margin-top: 6px;
-  color: #d1d5db;
-  font-size: 14px;
 }
 
 .tabs {
