@@ -303,7 +303,7 @@ export async function runFastestHistogram(imageData, options = {}) {
     passed300ms: result.timing.totalMs < 300,
     accuracy,
     selectionReason:
-      'Selected from exact benchmark candidates for the current image; histArray and non-retained variants are benchmark-only.',
+      'Selected from exact benchmark candidates for the current image; histArray, unroll2, and unroll8 are benchmark-only comparison items.',
     benchmarkSummary: {
       selectedAverageMs: best.timing.totalMs,
       candidateCount: rows.filter((row) => row.autoCandidate).length

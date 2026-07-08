@@ -19,18 +19,6 @@ const ALGORITHM_OPTIONS = [
     auto: 'exact'
   },
   {
-    key: 'fastest',
-    label: '默认精确',
-    description: '固定组合：精确灰度、循环展开、TypedArray、主线程。',
-    config: {
-      grayMode: 'floatGray',
-      grayStrategy: 'directGray',
-      loopMode: 'unroll4',
-      dataMode: 'histTypedArray',
-      threadMode: 'mainThread'
-    }
-  },
-  {
     key: 'baseline',
     label: '基准算法',
     description: '使用标准浮点灰度公式的参考结果，用于校验正确性。',

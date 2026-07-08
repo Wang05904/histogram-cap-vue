@@ -9,19 +9,22 @@
         </template>
         <p class="formula">gray = Math.round(r * 0.299 + g * 0.587 + b * 0.114)</p>
         <p>
-          基准算法与默认精确算法均使用该加权灰度公式，确保结果可校验。
+          基准算法与自动最快候选均使用该加权灰度公式，所有候选都需要与基准算法的
+          256 个 bin 完全一致。
         </p>
       </el-card>
 
       <el-card class="note-card" shadow="never">
         <template #header>
-          <div class="title">默认演示算法</div>
+          <div class="title">自动最快维度</div>
         </template>
         <el-descriptions :column="1" border>
-          <el-descriptions-item label="灰度">floatGray</el-descriptions-item>
-          <el-descriptions-item label="遍历">unrolledLoop</el-descriptions-item>
+          <el-descriptions-item label="灰度策略">直接公式 / 精确查表</el-descriptions-item>
+          <el-descriptions-item label="遍历策略">普通循环 / 展开 4 像素</el-descriptions-item>
           <el-descriptions-item label="数据结构">histTypedArray</el-descriptions-item>
-          <el-descriptions-item label="线程">mainThread</el-descriptions-item>
+          <el-descriptions-item label="线程策略">
+            主线程 / 单 Worker / 分块 Worker / 固定 2 Worker / 固定 4 Worker
+          </el-descriptions-item>
         </el-descriptions>
       </el-card>
 

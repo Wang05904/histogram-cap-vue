@@ -78,17 +78,7 @@ export const BENCHMARK_CONFIGS = [
     grayStrategy: 'directGray',
     loopMode: 'unroll4',
     dataMode: 'histTypedArray',
-    threadMode: 'mainThread',
-    includeImageData: true,
-    benchmarkOnly: true
-  },
-  {
-    grayMode: 'floatGray',
-    grayStrategy: 'directGray',
-    loopMode: 'unroll4',
-    dataMode: 'histTypedArray',
-    threadMode: 'singleWorker',
-    benchmarkOnly: true
+    threadMode: 'singleWorker'
   },
   {
     grayMode: 'floatGray',
@@ -96,8 +86,7 @@ export const BENCHMARK_CONFIGS = [
     loopMode: 'unroll4',
     dataMode: 'histTypedArray',
     threadMode: 'chunkWorker',
-    chunkSize: 32768,
-    benchmarkOnly: true
+    chunkSize: 32768
   },
   {
     grayMode: 'floatGray',
@@ -105,8 +94,7 @@ export const BENCHMARK_CONFIGS = [
     loopMode: 'unroll4',
     dataMode: 'histTypedArray',
     threadMode: 'chunkWorker',
-    chunkSize: 262144,
-    benchmarkOnly: true
+    chunkSize: 262144
   },
   {
     grayMode: 'floatGray',
@@ -114,8 +102,7 @@ export const BENCHMARK_CONFIGS = [
     loopMode: 'unroll4',
     dataMode: 'histTypedArray',
     threadMode: 'fixed2Worker',
-    workerCount: 2,
-    benchmarkOnly: true
+    workerCount: 2
   },
   {
     grayMode: 'floatGray',
