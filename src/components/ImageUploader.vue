@@ -55,6 +55,7 @@
 import { ref } from 'vue'
 import { Delete, Plus, Refresh } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { formatErrorMessage, validateImageFile } from '@/utils/errorHandler.js'
 
 defineProps({
   imageUrl: {
@@ -90,8 +91,10 @@ function onDrop(event) {
 }
 
 function loadFile(file) {
-  if (file.type && !file.type.startsWith('image')) {
-    ElMessage.error('请选择图片文件')
+  try {
+    validateImageFile(file)
+  } catch (error) {
+    ElMessage.error(formatErrorMessage(error))
     return
   }
 

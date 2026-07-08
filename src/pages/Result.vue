@@ -72,6 +72,22 @@
           对比当前图片性能
         </el-button>
 
+        <el-button
+          size="large"
+          :loading="store.saveLoading"
+          @click="store.saveHistogramImage"
+        >
+          保存直方图
+        </el-button>
+
+        <el-button
+          size="large"
+          :loading="store.saveLoading"
+          @click="store.saveMarkedOriginalImage"
+        >
+          保存标记原图
+        </el-button>
+
         <el-button size="large" @click="goHome">
           更换图片
         </el-button>
