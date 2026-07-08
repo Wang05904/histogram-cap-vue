@@ -1,179 +1,114 @@
 <template>
-  <div class="home-page">
+  <div class="page">
+    <AppHeader />
 
-    <!-- 顶部 -->
-    <AppHeader/>
-
-    <!-- 主体 -->
-    <div class="content">
-
-      <ImageUploader
+    <main class="layout">
+      <section class="left-column">
+        <ImageUploader
           :image-url="store.imageUrl"
           @image-selected="handleImageSelected"
-      />
+          @image-removed="handleImageRemoved"
+        />
+      </section>
 
-      <ControlPanel
-          v-model:algorithm="store.algorithm"
-          :loading="store.loading"
-          @start="handleStart"
-      />
+      <section class="right-column">
+        <ImagePreview
+          :image-url="store.imageUrl"
+          :image-name="store.imageName"
+          :image-width="store.imageWidth"
+          :image-height="store.imageHeight"
+        />
 
-    </div>
+        <AlgorithmSwitch
+          v-model="store.algorithm"
+          :options="store.algorithmOptions"
+        />
 
+        <div class="actions">
+          <el-button
+            type="primary"
+            size="large"
+            :loading="store.loading"
+            @click="handleStart"
+          >
+            生成直方图
+          </el-button>
+        </div>
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
 
-import ImageUploader from '@/components/ImageUploader.vue'
-import ControlPanel from '@/components/ControlPanel.vue'
+import AlgorithmSwitch from '@/components/AlgorithmSwitch.vue'
 import AppHeader from '@/components/AppHeader.vue'
-
+import ImagePreview from '@/components/ImagePreview.vue'
+import ImageUploader from '@/components/ImageUploader.vue'
 import { useHistogramStore } from '@/stores/histogram'
 
 const router = useRouter()
-
 const store = useHistogramStore()
 
 function handleImageSelected(payload) {
-
   store.setImage(payload)
+}
 
+function handleImageRemoved() {
+  store.removeImage()
 }
 
 async function handleStart() {
-
   const success = await store.startAnalysis()
 
   if (success) {
-
     router.push('/result')
-
   }
-
 }
 </script>
 
 <style scoped>
-
-.home-page{
-
-  min-height:100vh;
-
-  background:#f5f7fa;
-
-  padding:24px;
-
+.page {
+  min-height: 100vh;
+  padding: 24px;
+  background: #f3f4f6;
 }
 
-/* ---------------- Hero ---------------- */
-
-.hero{
-
-  height:190px;
-
-  border-radius:26px;
-
-  background:linear-gradient(
-      135deg,
-      #409EFF,
-      #66b1ff
-  );
-
-  color:white;
-
-  display:flex;
-
-  flex-direction:column;
-
-  justify-content:center;
-
-  align-items:center;
-
-  box-shadow:
-      0 12px 28px rgba(64,158,255,.22);
-
+.layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.95fr) minmax(360px, 1.05fr);
+  gap: 24px;
+  align-items: start;
 }
 
-.hero-icon{
-
-  width:72px;
-
-  height:72px;
-
-  border-radius:50%;
-
-  background:rgba(255,255,255,.18);
-
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  font-size:34px;
-
-  margin-bottom:16px;
-
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.hero h1{
-
-  margin:0;
-
-  font-size:34px;
-
-  font-weight:700;
-
+.actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
-.hero p{
-
-  margin-top:10px;
-
-  font-size:15px;
-
-  opacity:.92;
-
+.actions .el-button {
+  min-width: 220px;
 }
 
-/* ---------------- 内容 ---------------- */
-
-.content{
-
-  margin-top:24px;
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:24px;
-
-}
-
-/* ---------------- 手机 ---------------- */
-
-@media(max-width:768px){
-
-  .home-page{
-
-    padding:16px;
-
+@media (max-width: 900px) {
+  .page {
+    padding: 16px;
   }
 
-  .hero{
-
-    height:170px;
-
+  .layout {
+    grid-template-columns: 1fr;
   }
 
-  .hero h1{
-
-    font-size:28px;
-
+  .actions .el-button {
+    width: 100%;
   }
-
 }
-
 </style>

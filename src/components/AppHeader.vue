@@ -1,222 +1,126 @@
 <template>
-  <div class="header">
-
-    <!-- Logo -->
-
-    <div class="hero">
-
-      <div class="icon">
-
-        📊
-
-      </div>
-
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">H</div>
       <div>
-
-        <h1>图像直方图计算</h1>
-
-        <p>Histogram Performance Analyzer</p>
-
+        <h1>图像直方图性能分析系统</h1>
       </div>
-
     </div>
 
-    <!-- Tab -->
-
-    <div class="tabs">
-
-      <div
-          class="tab"
-          :class="{ active: route.path === '/home' }"
-          @click="router.push('/home')"
+    <nav class="tabs">
+      <button
+        type="button"
+        :class="{ active: route.path === '/home' }"
+        @click="router.push('/home')"
       >
-        首页
-      </div>
-
-      <div
-          class="tab"
-          :class="{ active: route.path === '/result' }"
-          @click="router.push('/result')"
+        工作台
+      </button>
+      <button
+        type="button"
+        :class="{ active: route.path === '/result' }"
+        @click="router.push('/result')"
       >
-        统计结果
-      </div>
-
-      <div
-          class="tab"
-          :class="{ active: route.path === '/about' }"
-          @click="router.push('/about')"
+        结果
+      </button>
+      <button
+        type="button"
+        :class="{ active: route.path === '/about' }"
+        @click="router.push('/about')"
       >
         算法说明
-      </div>
-
-    </div>
-
-  </div>
+      </button>
+    </nav>
+  </header>
 </template>
 
 <script setup>
-
 import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
-
 const route = useRoute()
-
 </script>
 
 <style scoped>
-
-.header{
-
-  margin-bottom:24px;
-
+.app-header {
+  margin-bottom: 24px;
 }
 
-.hero{
-
-  height:130px;
-
-  border-radius:24px;
-
-  background:linear-gradient(
-      135deg,
-      #409EFF,
-      #6fb7ff);
-
-  color:white;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:20px;
-
-  box-shadow:
-      0 10px 28px rgba(64,158,255,.25);
-
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 108px;
+  padding: 22px 26px;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+  text-align: left;
 }
 
-.icon{
-
-  width:70px;
-
-  height:70px;
-
-  border-radius:50%;
-
-  background:rgba(255,255,255,.18);
-
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  font-size:34px;
-
+.brand-mark {
+  display: flex;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #2563eb;
+  font-size: 28px;
+  font-weight: 800;
 }
 
-.hero h1{
-
-  margin:0;
-
-  font-size:32px;
-
+h1 {
+  margin: 0;
+  color: white;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
-.hero p{
-
-  margin-top:8px;
-
-  opacity:.92;
-
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 6px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
 }
 
-/* ---------------------- */
-
-.tabs{
-
-  margin-top:20px;
-
-  display:flex;
-
-  background:white;
-
-  border-radius:18px;
-
-  padding:6px;
-
-  box-shadow:
-      0 6px 18px rgba(0,0,0,.06);
-
+button {
+  flex: 1;
+  min-height: 42px;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
 }
 
-.tab{
-
-  flex:1;
-
-  text-align:center;
-
-  padding:14px;
-
-  border-radius:14px;
-
-  cursor:pointer;
-
-  transition:.25s;
-
-  font-size:15px;
-
-  font-weight:600;
-
+button:hover {
+  background: #eff6ff;
 }
 
-.tab:hover{
-
-  background:#ecf5ff;
-
+button.active {
+  background: #2563eb;
+  color: white;
 }
 
-.active{
-
-  background:#409EFF;
-
-  color:white;
-
-}
-
-@media(max-width:768px){
-
-  .hero{
-
-    height:110px;
-
+@media (max-width: 700px) {
+  .brand {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
-  .hero h1{
-
-    font-size:24px;
-
+  h1 {
+    font-size: 22px;
   }
 
-  .hero p{
-
-    font-size:13px;
-
+  .tabs {
+    flex-direction: column;
   }
-
-  .icon{
-
-    width:56px;
-
-    height:56px;
-
-    font-size:26px;
-
-  }
-
 }
-
 </style>
