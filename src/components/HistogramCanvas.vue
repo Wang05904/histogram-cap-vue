@@ -6,7 +6,10 @@
           <div class="title">256 x 100 黑白直方图</div>
           <div class="sub-title">使用算法返回的 ImageData 绘制</div>
         </div>
-        <el-tag round effect="plain" type="primary">256 个灰度桶</el-tag>
+        <div class="header-right">
+          <el-tag round effect="plain" type="primary">256 个灰度桶</el-tag>
+          <slot name="actions"></slot>
+        </div>
       </div>
     </template>
 
@@ -110,6 +113,14 @@ onMounted(draw)
   margin-top: 4px;
   color: var(--text-secondary);
   font-size: 12px;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 .canvas-shell {
   width: 100%;

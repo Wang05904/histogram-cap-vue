@@ -19,6 +19,13 @@
         >
           <template #actions>
             <el-button size="small" @click="goHome" class="change-img-btn">更换图片</el-button>
+            <el-button
+              size="small"
+              :loading="store.saveLoading"
+              @click="store.saveMarkedOriginalImage"
+            >
+              保存标记原图
+            </el-button>
           </template>
         </ImagePreview>
 
@@ -62,7 +69,17 @@
         :normalized-bins="store.histogram"
         :histogram-image-data="store.histogramImageData"
         @rendered="store.setRenderTime"
-      />
+      >
+        <template #actions>
+          <el-button
+            size="small"
+            :loading="store.saveLoading"
+            @click="store.saveHistogramImage"
+          >
+            保存直方图
+          </el-button>
+        </template>
+      </HistogramCanvas>
 
       <TimeDisplay
         :timing="store.timing"

@@ -2,7 +2,18 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { ElMessage } from 'element-plus'
 
+import {
+  createAppError,
+  ERROR_TYPES,
+  formatErrorMessage
+} from '@/utils/errorHandler.js'
 import { fileToImageData, cropImageData } from '@/utils/imagePixel.js'
+import {
+  buildHistogramPng,
+  buildMarkedOriginalPng,
+  createExportFileName,
+  saveImageFile
+} from '@/utils/imageExport.js'
 import { getHistogramStats } from '@/utils/normalize.js'
 import {
   benchmarkHistogramAlgorithms,
@@ -162,6 +173,7 @@ export const useHistogramStore = defineStore('histogram', () => {
 
   const loading = ref(false)
   const benchmarkLoading = ref(false)
+  const saveLoading = ref(false)
 
   const bins = ref(new Array(256).fill(0))
   const histogram = ref(new Array(256).fill(0))
@@ -419,7 +431,7 @@ export const useHistogramStore = defineStore('histogram', () => {
       return true
     } catch (error) {
       console.error(error)
-      ElMessage.error('直方图生成失败')
+      ElMessage.error(formatErrorMessage(error))
       clearResult()
       return false
     } finally {
@@ -451,10 +463,81 @@ export const useHistogramStore = defineStore('histogram', () => {
       return rows
     } catch (error) {
       console.error(error)
-      ElMessage.error('性能对比失败')
+      ElMessage.error(formatErrorMessage(error))
       return []
     } finally {
       benchmarkLoading.value = false
+    }
+  }
+
+  function ensureResultReady() {
+    if (!pixelCount.value || !histogram.value.some((value) => value > 0)) {
+      throw createAppError(ERROR_TYPES.NO_RESULT)
+    }
+  }
+
+  async function saveHistogramImage() {
+    saveLoading.value = true
+
+    try {
+      ensureResultReady()
+      const dataUrl = buildHistogramPng(histogram.value)
+      const filename = createExportFileName(imageName.value, 'histogram')
+      const result = await saveImageFile(dataUrl, filename)
+
+      ElMessage.success(result.platform === 'native'
+        ? `直方图已保存到应用本地目录：${result.path}`
+        : '直方图 PNG 已开始下载')
+      return result
+    } catch (error) {
+      console.error(error)
+      ElMessage.error(formatErrorMessage(error, ERROR_TYPES.SAVE_FAILED))
+      return null
+    } finally {
+      saveLoading.value = false
+    }
+  }
+
+
+  function getMarkedImageSource() {
+    if (fullImageData.value && cropRect.value && cropRect.value.width > 0 && cropRect.value.height > 0) {
+      const { imageData: cropped, width, height } = cropImageData(fullImageData.value, cropRect.value)
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.putImageData(cropped, 0, 0)
+        return canvas.toDataURL('image/png')
+      }
+    }
+    return imageUrl.value
+  }
+
+  async function saveMarkedOriginalImage() {
+    saveLoading.value = true
+
+    try {
+      ensureResultReady()
+      const sourceUrl = getMarkedImageSource()
+      const dataUrl = await buildMarkedOriginalPng(sourceUrl, {
+        passed300ms: passed300ms.value,
+        sameAsBaseline: accuracy.value.sameAsBaseline,
+        algorithmName: algorithmName.value
+      })
+      const filename = createExportFileName(imageName.value, 'marked-original')
+      const result = await saveImageFile(dataUrl, filename)
+
+      ElMessage.success(result.platform === 'native'
+        ? `标记原图已保存到应用本地目录：${result.path}`
+        : '标记原图 PNG 已开始下载')
+      return result
+    } catch (error) {
+      console.error(error)
+      ElMessage.error(formatErrorMessage(error, ERROR_TYPES.SAVE_FAILED))
+      return null
+    } finally {
+      saveLoading.value = false
     }
   }
 
@@ -482,12 +565,15 @@ export const useHistogramStore = defineStore('histogram', () => {
     peakGray,
     pixelCount,
     selectedAlgorithm,
+    saveLoading,
     timing,
     clearCropRect,
     cropRect,
     croppedImageUrl,
     removeImage,
     runBenchmark,
+    saveHistogramImage,
+    saveMarkedOriginalImage,
     setAlgorithm,
     setCropRect,
     setImage,

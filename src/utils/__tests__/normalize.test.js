@@ -25,10 +25,10 @@ describe('normalizeHistogram - 归一化到 0~100', () => {
   it('线性分布 hist[i]=i：归一化后最大值为 100', () => {
     const hist = Array.from({ length: 256 }, (_, i) => i)
     const result = normalizeHistogram(hist)
-    // max = 255，normalized[i] = i / 255 * 100
-    expect(result[255]).toBeCloseTo(100, 6)
+    // max = 255，normalized[i] = round(i / 255 * 100)
+    expect(result[255]).toBe(100)
     expect(result[0]).toBe(0)
-    expect(result[128]).toBeCloseTo((128 / 255) * 100, 6)
+    expect(result[128]).toBe(Math.round((128 / 255) * 100))
   })
 
   it('单峰分布：峰值归一化为 100，其余按比例', () => {
@@ -79,21 +79,21 @@ describe('computeHistogram - 两种灰度化方式', () => {
     })
   })
 
-  describe('realtime（统计时灰度化，平均公式）', () => {
+  describe('realtime（统计时灰度化，标准加权公式）', () => {
     it('全黑图片：灰度 0 计数等于像素总数', () => {
       const hist = computeHistogram(BLACK_2x2, 'realtime')
       expect(hist[0]).toBe(4)
     })
 
-    it('全白图片：平均灰度 (255+255+255)/3 = 255', () => {
+    it('全白图片：标准加权灰度 = 255', () => {
       const hist = computeHistogram(WHITE_2x2, 'realtime')
       expect(hist[255]).toBe(4)
     })
 
-    it('纯红图片：平均灰度 round(255/3) = 85', () => {
+    it('纯红图片：标准加权灰度 round(255 * 0.299) = 76', () => {
       const red = createSolidImageData(2, 2, 255, 0, 0)
       const hist = computeHistogram(red, 'realtime')
-      expect(hist[85]).toBe(4)
+      expect(hist[76]).toBe(4)
     })
 
     it('缺省参数默认使用 realtime', () => {

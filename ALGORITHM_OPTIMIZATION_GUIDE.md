@@ -91,6 +91,18 @@ gray = Math.round(red * 0.299 + green * 0.587 + blue * 0.114)
 - `unroll2` / `unroll8`：没有稳定优于保留方案。
 - `includeImageData`：已从 benchmark 组合中删除。自动最快只比较直方图统计与归一化，页面需要绘制时再生成或使用 `normalizedBins`。
 
+## 结果保存与异常提示
+
+当前版本在页面层补充了结果保存和异常分类，不改变算法核心：
+
+- 保存直方图：根据 `normalizedBins` 生成 256×100 黑白 PNG。
+- 保存标记原图：在原图右上角标注 `<300ms`、是否与基准一致和算法名称。
+- Web 端保存方式：触发浏览器下载 PNG。
+- Android/Capacitor 端保存方式：使用 `@capacitor/filesystem` 写入应用本地文件目录。
+- 注意：`@capacitor/camera` 的 `saveToGallery` 主要用于拍照/选图流程，不适合直接保存任意 canvas 生成图；如果必须写入系统相册，需要额外接入 Android MediaStore 或相册保存插件。
+
+异常处理会区分文件类型不支持、图片解码失败、图片过大/OOM、Canvas 不可用、Worker 失败、保存失败和权限拒绝，并给出中文提示。
+
 ## 验证命令
 
 ```bash
