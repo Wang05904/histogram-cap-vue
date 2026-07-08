@@ -2,16 +2,12 @@ export const ERROR_TYPES = {
   PERMISSION_DENIED: 'PERMISSION_DENIED',
   DECODE_FAILED: 'DECODE_FAILED',
   UNSUPPORTED_FILE: 'UNSUPPORTED_FILE',
-  IMAGE_TOO_LARGE: 'IMAGE_TOO_LARGE',
   CANVAS_UNAVAILABLE: 'CANVAS_UNAVAILABLE',
   WORKER_FAILED: 'WORKER_FAILED',
   SAVE_FAILED: 'SAVE_FAILED',
   NO_RESULT: 'NO_RESULT',
   UNKNOWN: 'UNKNOWN'
 }
-
-export const MAX_IMAGE_FILE_SIZE = 30 * 1024 * 1024
-export const MAX_IMAGE_PIXELS = 24 * 1000 * 1000
 
 const SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'bmp', 'webp']
 
@@ -27,10 +23,6 @@ const ERROR_MESSAGES = {
   [ERROR_TYPES.UNSUPPORTED_FILE]: {
     title: '文件类型不支持',
     message: '请选择 JPG、PNG、BMP 或 WEBP 图片文件。'
-  },
-  [ERROR_TYPES.IMAGE_TOO_LARGE]: {
-    title: '图片过大',
-    message: '图片尺寸或文件体积过大，可能导致内存不足，请更换较小图片。'
   },
   [ERROR_TYPES.CANVAS_UNAVAILABLE]: {
     title: 'Canvas 不可用',
@@ -78,10 +70,6 @@ export function validateImageFile(file) {
   if (!isSupportedImageFile(file)) {
     throw createAppError(ERROR_TYPES.UNSUPPORTED_FILE)
   }
-
-  if (file.size > MAX_IMAGE_FILE_SIZE) {
-    throw createAppError(ERROR_TYPES.IMAGE_TOO_LARGE)
-  }
 }
 
 export function normalizeError(error, fallbackType = ERROR_TYPES.UNKNOWN) {
@@ -97,10 +85,6 @@ export function normalizeError(error, fallbackType = ERROR_TYPES.UNKNOWN) {
 
   if (message.includes('decode') || message.includes('load image') || message.includes('image')) {
     return ERROR_TYPES.DECODE_FAILED
-  }
-
-  if (message.includes('memory') || message.includes('oom') || message.includes('allocation')) {
-    return ERROR_TYPES.IMAGE_TOO_LARGE
   }
 
   if (message.includes('canvas') || message.includes('getimagedata') || message.includes('2d context')) {

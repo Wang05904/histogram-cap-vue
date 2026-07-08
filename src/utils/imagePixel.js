@@ -1,7 +1,6 @@
 import {
   createAppError,
   ERROR_TYPES,
-  MAX_IMAGE_PIXELS,
   validateImageFile
 } from '@/utils/errorHandler.js'
 
@@ -29,10 +28,6 @@ export async function imagePathToImageData(src) {
     throw createAppError(ERROR_TYPES.DECODE_FAILED, 'Invalid image size')
   }
 
-  if (canvas.width * canvas.height > MAX_IMAGE_PIXELS) {
-    throw createAppError(ERROR_TYPES.IMAGE_TOO_LARGE, 'Image dimensions exceed the safe processing limit')
-  }
-
   const context = canvas.getContext('2d', { willReadFrequently: true })
 
   if (!context) {
@@ -50,7 +45,7 @@ export async function imagePathToImageData(src) {
   try {
     imageData = context.getImageData(0, 0, canvas.width, canvas.height)
   } catch (error) {
-    throw createAppError(ERROR_TYPES.IMAGE_TOO_LARGE, 'Unable to read image pixels from canvas', error)
+    throw createAppError(ERROR_TYPES.CANVAS_UNAVAILABLE, 'Unable to read image pixels from canvas', error)
   }
 
   return {
