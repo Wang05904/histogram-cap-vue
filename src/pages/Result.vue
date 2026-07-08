@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="page">
     <AppHeader />
 
@@ -16,14 +16,29 @@
           :image-name="store.imageName"
           :image-width="store.imageWidth"
           :image-height="store.imageHeight"
-        />
+        >
+          <template #actions>
+            <el-button size="small" @click="goHome" class="change-img-btn">更换图片</el-button>
+          </template>
+        </ImagePreview>
 
         <div class="side-panel">
-          <AlgorithmSwitch
-            v-model="store.algorithm"
-            :options="store.algorithmOptions"
-          />
-          <el-alert
+        <AlgorithmSwitch
+          v-model="store.algorithm"
+          :options="store.algorithmOptions"
+        >
+          <template #action>
+            <el-button
+              type="primary"
+              size="large"
+              :loading="store.loading"
+              @click="store.startAnalysis"
+            >
+              运行当前算法
+            </el-button>
+          </template>
+        </AlgorithmSwitch>
+        <el-alert
             v-if="store.algorithm === 'autoExact'"
             type="info"
             :closable="false"
@@ -56,24 +71,11 @@
 
       <section class="actions">
         <el-button
-          type="primary"
-          size="large"
-          :loading="store.loading"
-          @click="store.startAnalysis"
-        >
-          运行当前算法
-        </el-button>
-
-        <el-button
           size="large"
           :loading="store.benchmarkLoading"
           @click="store.runBenchmark"
         >
           对比当前图片性能
-        </el-button>
-
-        <el-button size="large" @click="goHome">
-          更换图片
         </el-button>
       </section>
 
@@ -85,8 +87,8 @@
         <template #header>
           <div class="card-header">
             <div>
-              <div class="title">性能对比</div>
-              <div class="sub-title">每个算法预热一次后统计 5 次平均耗时；自动模式会使用该结果选择最快组合</div>
+              <div class="section-title">性能对比</div>
+              <div class="section-sub">每个算法预热一次后统计 5 次平均耗时；自动模式会使用该结果选择最快组合</div>
             </div>
           </div>
         </template>
@@ -137,37 +139,86 @@ function goHome() {
 </script>
 
 <style scoped>
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .page {
   min-height: 100vh;
-  padding: 24px;
-  background: #f3f4f6;
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Staggered card entrance */
+.top-grid > * {
+  animation: card-rise 0.5s ease-out backwards;
+}
+
+.top-grid > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.top-grid > *:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.actions {
+  animation: card-rise 0.45s ease-out backwards;
+  animation-delay: 0.35s;
+}
+
+.benchmark-card {
+  animation: card-rise 0.45s ease-out backwards;
+  animation-delay: 0.4s;
+}
+
+:deep(.histogram-card) {
+  animation: card-rise 0.45s ease-out backwards;
+  animation-delay: 0.25s;
+}
+
+:deep(.time-card) {
+  animation: card-rise 0.45s ease-out backwards;
+  animation-delay: 0.3s;
 }
 
 .top-grid {
   display: grid;
   grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .side-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .actions {
   display: flex;
   gap: 12px;
-  justify-content: flex-end;
-  margin: 20px 0;
-  flex-wrap: wrap;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.change-img-btn {
+  font-size: 13px;
+  padding: 5px 14px;
+  height: auto;
 }
 
 .benchmark-card {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+  box-shadow: none !important;
+  background: var(--paper-card);
 }
 
 .card-header {
@@ -176,23 +227,20 @@ function goHome() {
   justify-content: space-between;
 }
 
-.title {
-  color: #1f2937;
-  font-size: 18px;
+.section-title {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 17px;
   font-weight: 700;
 }
 
-.sub-title {
+.section-sub {
   margin-top: 4px;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 12px;
 }
 
 @media (max-width: 900px) {
-  .page {
-    padding: 16px;
-  }
-
   .top-grid {
     grid-template-columns: 1fr;
   }
@@ -203,7 +251,6 @@ function goHome() {
 
   .actions .el-button {
     width: 100%;
-    margin-left: 0;
   }
 }
 </style>

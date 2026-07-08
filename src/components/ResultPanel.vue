@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-card class="result-card" shadow="never">
     <template #header>
       <div class="card-header">
@@ -80,28 +80,31 @@ const imageSize = computed(() => {
 
 <style scoped>
 .result-card {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+  background: var(--paper-card);
 }
-
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-
 .title {
-  color: #1f2937;
-  font-size: 18px;
+  color: var(--text-primary);
+  font-size: 16px;
   font-weight: 700;
 }
-
 .sub-title {
   margin-top: 4px;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 12px;
   word-break: break-word;
+}
+:deep(.el-tag--success) {
+  background: #F0F7EA;
+  color: var(--success);
+}
+:deep(.el-tag--warning) {
+  background: #FDF8EC;
+  color: var(--warning);
 }
 </style>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-card class="histogram-card" shadow="never">
     <template #header>
       <div class="card-header">
@@ -93,43 +93,40 @@ onMounted(draw)
 
 <style scoped>
 .histogram-card {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+  background: var(--paper-card);
 }
-
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-
 .title {
-  color: #1f2937;
-  font-size: 18px;
+  color: var(--text-primary);
+  font-size: 16px;
   font-weight: 700;
 }
-
 .sub-title {
   margin-top: 4px;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 12px;
 }
-
 .canvas-shell {
   width: 100%;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #ffffff;
+  border-radius: 10px;
+  background: var(--paper-card);
+  box-shadow: 0 0 0 1px var(--border-paper) inset;
 }
-
 canvas {
   display: block;
   width: 100%;
   height: auto;
   min-height: 220px;
   image-rendering: pixelated;
+}
+:deep(.el-tag--primary) {
+  background: #FDF5ED;
+  color: var(--accent);
 }
 </style>

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-card class="switch-card" shadow="never">
     <template #header>
       <div class="card-header">
@@ -23,6 +23,9 @@
         :value="option.key"
       />
     </el-select>
+    <div class="action-slot">
+      <slot name="action"></slot>
+    </div>
   </el-card>
 </template>
 
@@ -53,32 +56,49 @@ const currentLabel = computed(() => {
 
 <style scoped>
 .switch-card {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+  background: var(--paper-card);
 }
-
 .card-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
 }
-
 .title {
-  color: #1f2937;
-  font-size: 18px;
+  color: var(--text-primary);
+  font-size: 16px;
   font-weight: 700;
 }
-
 .sub-title {
   margin-top: 4px;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 12px;
   line-height: 1.4;
 }
-
 .algorithm-select {
   width: 100%;
+}
+.action-slot {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+:deep(.el-select .el-input__wrapper) {
+  background: var(--paper-input);
+  box-shadow: 0 0 0 1px var(--border-paper) inset;
+  border-radius: 10px;
+}
+:deep(.el-select .el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+:deep(.el-select .el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+:deep(.el-select .el-input__inner) {
+  color: var(--text-primary);
+}
+:deep(.el-tag) {
+  background: var(--paper-input);
+  color: var(--text-secondary);
 }
 </style>

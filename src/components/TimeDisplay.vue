@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-card class="time-card" shadow="never">
     <template #header>
       <div class="card-header">
@@ -50,57 +50,57 @@ function formatMs(value) {
 
 <style scoped>
 .time-card {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+  background: var(--paper-card);
 }
-
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-
 .title {
-  color: #1f2937;
-  font-size: 18px;
+  color: var(--text-primary);
+  font-size: 16px;
   font-weight: 700;
 }
-
 .sub-title {
   margin-top: 4px;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 12px;
 }
-
 .timing-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
-
 .metric {
   min-width: 0;
-  padding: 12px;
-  border-radius: 8px;
-  background: #f9fafb;
+  padding: 14px 12px;
+  border-radius: 10px;
+  background: var(--paper-input);
+  box-shadow: 0 0 0 1px var(--border-paper) inset;
 }
-
 .metric span {
   display: block;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 12px;
 }
-
 .metric strong {
   display: block;
   margin-top: 6px;
-  color: #111827;
-  font-size: 16px;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
   word-break: break-word;
 }
-
+:deep(.el-tag--success) {
+  background: #F0F7EA;
+  color: var(--success);
+}
+:deep(.el-tag--danger) {
+  background: #FDF0F0;
+  color: var(--danger);
+}
 @media (max-width: 860px) {
   .timing-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

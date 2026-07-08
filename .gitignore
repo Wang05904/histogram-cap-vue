@@ -115,3 +115,4 @@ performance-record.csv
 # 终端历史、缓存
 .history
 .cache/
+.codex/

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <router-view />
 </template>
 
@@ -7,9 +7,9 @@ html,
 body,
 #app {
   width: 100%;
-  min-height: 100%;
+  min-height: 100vh;
   margin: 0;
-  background: #f5f7fa;
+  background: var(--paper-bg);
 }
 
 * {

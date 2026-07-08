@@ -6,9 +6,12 @@
           <div class="title">原图预览</div>
           <div class="sub-title">{{ imageName || '尚未选择图片' }}</div>
         </div>
-        <el-tag v-if="imageWidth && imageHeight" round effect="plain">
-          {{ imageWidth }} x {{ imageHeight }}
-        </el-tag>
+        <div class="header-right">
+          <el-tag v-if="imageWidth && imageHeight" round effect="plain">
+            {{ imageWidth }} x {{ imageHeight }}
+          </el-tag>
+          <slot name="actions"></slot>
+        </div>
       </div>
     </template>
 
@@ -43,44 +46,51 @@ defineProps({
 <style scoped>
 .preview-card {
   height: 100%;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+  background: var(--paper-card);
 }
-
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-
 .title {
-  color: #1f2937;
-  font-size: 18px;
+  color: var(--text-primary);
+  font-size: 16px;
   font-weight: 700;
 }
-
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
 .sub-title {
   margin-top: 4px;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: 12px;
   word-break: break-all;
 }
-
 .preview-area {
   display: flex;
   min-height: 300px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 8px;
-  background: #f9fafb;
+  border-radius: 10px;
+  background: var(--paper-input);
 }
-
 img {
   max-width: 100%;
   max-height: 360px;
   object-fit: contain;
+  border-radius: 6px;
+}
+:deep(.el-tag) {
+  background: var(--paper-input);
+  color: var(--text-secondary);
+}
+:deep(.el-empty__description p) {
+  color: var(--text-muted);
 }
 </style>

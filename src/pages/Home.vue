@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="page">
     <AppHeader />
 
@@ -71,14 +71,15 @@ async function handleStart() {
 <style scoped>
 .page {
   min-height: 100vh;
-  padding: 24px;
-  background: #f3f4f6;
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .layout {
   display: grid;
   grid-template-columns: minmax(300px, 0.95fr) minmax(360px, 1.05fr);
-  gap: 24px;
+  gap: 16px;
   align-items: start;
 }
 
@@ -86,7 +87,7 @@ async function handleStart() {
 .right-column {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .actions {
@@ -96,13 +97,10 @@ async function handleStart() {
 
 .actions .el-button {
   min-width: 220px;
+  border-radius: 10px;
 }
 
 @media (max-width: 900px) {
-  .page {
-    padding: 16px;
-  }
-
   .layout {
     grid-template-columns: 1fr;
   }

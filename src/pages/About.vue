@@ -1,11 +1,11 @@
-<template>
+﻿<template>
   <div class="page">
     <AppHeader />
 
     <section class="notes-grid">
       <el-card class="note-card" shadow="never">
         <template #header>
-          <div class="title">精确灰度公式</div>
+          <div class="card-title">精确灰度公式</div>
         </template>
         <p class="formula">gray = Math.round(r * 0.299 + g * 0.587 + b * 0.114)</p>
         <p>
@@ -16,7 +16,7 @@
 
       <el-card class="note-card" shadow="never">
         <template #header>
-          <div class="title">自动最快维度</div>
+          <div class="card-title">自动最快维度</div>
         </template>
         <el-descriptions :column="1" border>
           <el-descriptions-item label="灰度策略">直接公式 / 精确查表</el-descriptions-item>
@@ -30,7 +30,7 @@
 
       <el-card class="note-card wide" shadow="never">
         <template #header>
-          <div class="title">输出数据接口</div>
+          <div class="card-title">输出数据接口</div>
         </template>
         <ul>
           <li>原始 bins：256 个灰度频次。</li>
@@ -50,51 +50,50 @@ import AppHeader from '@/components/AppHeader.vue'
 <style scoped>
 .page {
   min-height: 100vh;
-  padding: 24px;
-  background: #f3f4f6;
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .notes-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-}
-
-.note-card {
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(31, 41, 55, 0.08);
+  gap: 16px;
 }
 
 .wide {
   grid-column: 1 / -1;
 }
 
-.title {
-  color: #1f2937;
-  font-size: 18px;
+.card-title {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 16px;
   font-weight: 700;
 }
 
 p,
 li {
-  color: #4b5563;
-  line-height: 1.7;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin: 0;
+}
+
+li + li {
+  margin-top: 6px;
 }
 
 .formula {
-  padding: 12px;
-  border-radius: 8px;
-  background: #f9fafb;
-  color: #111827;
-  font-family: Consolas, monospace;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--paper-input);
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  box-shadow: 0 0 0 1px var(--border-paper) inset;
 }
 
 @media (max-width: 800px) {
-  .page {
-    padding: 16px;
-  }
-
   .notes-grid {
     grid-template-columns: 1fr;
   }
