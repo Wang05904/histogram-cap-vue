@@ -53,6 +53,7 @@ defineProps({
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
 }
 .title {
   color: var(--text-primary);
@@ -64,6 +65,8 @@ defineProps({
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 .sub-title {
   margin-top: 4px;
@@ -73,7 +76,7 @@ defineProps({
 }
 .preview-area {
   display: flex;
-  min-height: 300px;
+  min-height: 160px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -82,7 +85,7 @@ defineProps({
 }
 img {
   max-width: 100%;
-  max-height: 360px;
+  max-height: 280px;
   object-fit: contain;
   border-radius: 6px;
 }
@@ -92,5 +95,18 @@ img {
 }
 :deep(.el-empty__description p) {
   color: var(--text-muted);
+}
+
+@media (max-width: 600px) {
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>

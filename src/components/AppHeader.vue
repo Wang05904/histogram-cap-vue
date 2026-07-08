@@ -47,46 +47,46 @@ const route = useRoute()
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: nowrap;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-@keyframes breathe-glow {
+@keyframes logo-pulse {
   0%, 100% {
-    box-shadow: 0 2px 8px rgba(196, 125, 90, 0.25);
+    box-shadow: 0 1px 4px rgba(196, 125, 90, 0.3);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 2px 18px rgba(196, 125, 90, 0.5), 0 0 32px rgba(196, 125, 90, 0.15);
-    transform: scale(1.05);
+    box-shadow: 0 1px 10px rgba(196, 125, 90, 0.45), 0 0 18px rgba(196, 125, 90, 0.1);
+    transform: scale(1.03);
   }
 }
 
 .brand-mark {
   display: flex;
-  width: 38px;
-  height: 38px;
+  width: 30px;
+  height: 30px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--accent);
-  box-shadow: 0 2px 8px rgba(196, 125, 90, 0.25);
-  animation: breathe-glow 4s ease-in-out infinite;
+  box-shadow: 0 1px 4px rgba(196, 125, 90, 0.3);
+  animation: logo-pulse 5s ease-in-out infinite;
 }
 
 .mark-text {
   color: white;
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1;
 }
@@ -95,15 +95,15 @@ h1 {
   margin: 0;
   color: var(--text-primary);
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
 
 .tabs {
   display: flex;
-  gap: 4px;
+  gap: 0;
   flex-shrink: 0;
 }
 
@@ -116,9 +116,9 @@ button {
   border-radius: 0;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  padding: 0 12px;
+  padding: 0 10px;
   transition: all 0.25s ease;
 }
 
@@ -133,28 +133,31 @@ button.active {
   border-bottom-color: var(--accent);
 }
 
-@media (max-width: 850px) {
+@media (max-width: 870px) {
   .app-header {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .brand {
-    gap: 12px;
+    gap: 8px;
   }
 
   h1 {
-    font-size: 17px;
+    font-size: 14px;
   }
 
   .tabs {
     width: 100%;
-    gap: 2px;
+    gap: 0;
   }
 
   button {
     flex: 1;
+    font-size: 13px;
+    padding: 0 8px;
   }
 }
 </style>

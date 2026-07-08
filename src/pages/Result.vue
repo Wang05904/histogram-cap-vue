@@ -12,7 +12,7 @@
     <template v-else>
       <section class="top-grid">
         <ImagePreview
-          :image-url="store.imageUrl"
+          :image-url="store.croppedImageUrl || store.imageUrl"
           :image-name="store.imageName"
           :image-width="store.imageWidth"
           :image-height="store.imageHeight"
@@ -139,55 +139,11 @@ function goHome() {
 </script>
 
 <style scoped>
-@keyframes card-rise {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .page {
   min-height: 100vh;
   padding: 16px;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-/* Staggered card entrance */
-.top-grid > * {
-  animation: card-rise 0.5s ease-out backwards;
-}
-
-.top-grid > *:nth-child(1) {
-  animation-delay: 0.05s;
-}
-
-.top-grid > *:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.actions {
-  animation: card-rise 0.45s ease-out backwards;
-  animation-delay: 0.35s;
-}
-
-.benchmark-card {
-  animation: card-rise 0.45s ease-out backwards;
-  animation-delay: 0.4s;
-}
-
-:deep(.histogram-card) {
-  animation: card-rise 0.45s ease-out backwards;
-  animation-delay: 0.25s;
-}
-
-:deep(.time-card) {
-  animation: card-rise 0.45s ease-out backwards;
-  animation-delay: 0.3s;
 }
 
 .top-grid {
@@ -247,6 +203,7 @@ function goHome() {
 
   .actions {
     flex-direction: column;
+    align-items: stretch;
   }
 
   .actions .el-button {

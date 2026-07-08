@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { ElMessage } from 'element-plus'
 
-import { fileToImageData } from '@/utils/imagePixel.js'
+import { fileToImageData, cropImageData } from '@/utils/imagePixel.js'
 import { getHistogramStats } from '@/utils/normalize.js'
 import {
   benchmarkHistogramAlgorithms,
@@ -148,6 +148,9 @@ export const useHistogramStore = defineStore('histogram', () => {
   const imageFile = ref(null)
   const imageName = ref('')
   const imageData = ref(null)
+  const fullImageData = ref(null)
+  const cropRect = ref(null)
+  const croppedImageUrl = ref(null)
 
   const imageWidth = ref(0)
   const imageHeight = ref(0)
@@ -192,6 +195,9 @@ export const useHistogramStore = defineStore('histogram', () => {
 
   function clearResult() {
     imageData.value = null
+    fullImageData.value = null
+    cropRect.value = null
+    croppedImageUrl.value = null
     imageWidth.value = 0
     imageHeight.value = 0
     pixelCount.value = 0
@@ -218,6 +224,76 @@ export const useHistogramStore = defineStore('histogram', () => {
     imageFile.value = payload.file
     imageName.value = payload.file?.name || '当前图片'
     clearResult()
+
+    // Convert blob URL to stable data URL for persistence across route changes
+    toDataUrl(payload.url)
+      .then((dataUrl) => {
+        if (imageUrl.value === payload.url) {
+          imageUrl.value = dataUrl
+          URL.revokeObjectURL(payload.url)
+        }
+      })
+      .catch(() => {
+        // If conversion fails, keep the blob URL
+      })
+  }
+
+  async function toDataUrl(src) {
+    const img = await loadImageElement(src)
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth || img.width
+    canvas.height = img.naturalHeight || img.height
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('No 2d context')
+    ctx.drawImage(img, 0, 0)
+    return canvas.toDataURL('image/png')
+  }
+
+  function setCropRect(rect) {
+    cropRect.value = rect ? { ...rect } : null
+    imageData.value = null
+    croppedImageUrl.value = null
+
+    // Lazy-load full image data so crop preview can generate immediately
+    if (rect && imageFile.value && !fullImageData.value) {
+      loadFullImageData().then(() => regenerateCroppedPreview())
+    } else {
+      regenerateCroppedPreview()
+    }
+  }
+
+  function clearCropRect() {
+    cropRect.value = null
+    imageData.value = null
+    croppedImageUrl.value = null
+  }
+
+  async function loadFullImageData() {
+    if (fullImageData.value) return
+    const loaded = await fileToImageData(imageFile.value)
+    fullImageData.value = loaded.imageData
+  }
+
+  function regenerateCroppedPreview() {
+    if (!fullImageData.value) return
+    if (!cropRect.value || cropRect.value.width <= 0 || cropRect.value.height <= 0) {
+      croppedImageUrl.value = null
+      return
+    }
+    try {
+      const { imageData: cropped, width, height } = cropImageData(fullImageData.value, cropRect.value)
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.putImageData(cropped, 0, 0)
+        croppedImageUrl.value = canvas.toDataURL('image/png')
+      }
+    } catch (e) {
+      console.warn('Failed to generate crop preview:', e)
+      croppedImageUrl.value = null
+    }
   }
 
   function removeImage() {
@@ -241,13 +317,26 @@ export const useHistogramStore = defineStore('histogram', () => {
       throw new Error('请先上传图片')
     }
 
-    const loaded = await fileToImageData(imageFile.value)
-    imageData.value = loaded.imageData
-    imageWidth.value = loaded.width
-    imageHeight.value = loaded.height
-    pixelCount.value = loaded.width * loaded.height
+    if (!fullImageData.value) {
+      await loadFullImageData()
+      regenerateCroppedPreview()
+    }
 
-    return loaded.imageData
+    if (cropRect.value && cropRect.value.width > 0 && cropRect.value.height > 0) {
+      const cropped = cropImageData(fullImageData.value, cropRect.value)
+      imageData.value = cropped.imageData
+      imageWidth.value = cropped.width
+      imageHeight.value = cropped.height
+      pixelCount.value = cropped.width * cropped.height
+      return cropped.imageData
+    }
+
+    croppedImageUrl.value = null
+    imageData.value = fullImageData.value
+    imageWidth.value = fullImageData.value.width
+    imageHeight.value = fullImageData.value.height
+    pixelCount.value = fullImageData.value.width * fullImageData.value.height
+    return fullImageData.value
   }
 
   async function runBenchmarkRows(currentImageData, runs = 5) {
@@ -394,9 +483,13 @@ export const useHistogramStore = defineStore('histogram', () => {
     pixelCount,
     selectedAlgorithm,
     timing,
+    clearCropRect,
+    cropRect,
+    croppedImageUrl,
     removeImage,
     runBenchmark,
     setAlgorithm,
+    setCropRect,
     setImage,
     setRenderTime,
     startAnalysis

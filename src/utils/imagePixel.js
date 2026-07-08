@@ -50,7 +50,28 @@ export function fileToImageData(file) {
   })
 }
 
+
+export function cropImageData(imageData, rect) {
+  const x = Math.max(0, Math.round(rect.x))
+  const y = Math.max(0, Math.round(rect.y))
+  const w = Math.min(imageData.width - x, Math.max(1, Math.round(rect.width)))
+  const h = Math.min(imageData.height - y, Math.max(1, Math.round(rect.height)))
+  const cropped = new ImageData(w, h)
+  for (let row = 0; row < h; row++) {
+    for (let col = 0; col < w; col++) {
+      const srcIdx = ((y + row) * imageData.width + (x + col)) * 4
+      const dstIdx = (row * w + col) * 4
+      cropped.data[dstIdx]     = imageData.data[srcIdx]
+      cropped.data[dstIdx + 1] = imageData.data[srcIdx + 1]
+      cropped.data[dstIdx + 2] = imageData.data[srcIdx + 2]
+      cropped.data[dstIdx + 3] = imageData.data[srcIdx + 3]
+    }
+  }
+  return { imageData: cropped, width: w, height: h }
+}
+
 export default {
+  cropImageData,
   fileToImageData,
   imagePathToImageData,
   loadImageElement

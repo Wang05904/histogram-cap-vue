@@ -3,38 +3,29 @@
     <AppHeader />
 
     <main class="layout">
-      <section class="left-column">
-        <ImageUploader
-          :image-url="store.imageUrl"
-          @image-selected="handleImageSelected"
-          @image-removed="handleImageRemoved"
-        />
-      </section>
+      <ImageUploader
+        :image-url="store.imageUrl"
+        :crop-rect="store.cropRect"
+        @image-selected="handleImageSelected"
+        @image-removed="handleImageRemoved"
+        @crop-changed="handleCropChanged"
+      />
 
-      <section class="right-column">
-        <ImagePreview
-          :image-url="store.imageUrl"
-          :image-name="store.imageName"
-          :image-width="store.imageWidth"
-          :image-height="store.imageHeight"
-        />
+      <AlgorithmSwitch
+        v-model="store.algorithm"
+        :options="store.algorithmOptions"
+      />
 
-        <AlgorithmSwitch
-          v-model="store.algorithm"
-          :options="store.algorithmOptions"
-        />
-
-        <div class="actions">
-          <el-button
-            type="primary"
-            size="large"
-            :loading="store.loading"
-            @click="handleStart"
-          >
-            生成直方图
-          </el-button>
-        </div>
-      </section>
+      <div class="actions">
+        <el-button
+          type="primary"
+          size="large"
+          :loading="store.loading"
+          @click="handleStart"
+        >
+          生成直方图
+        </el-button>
+      </div>
     </main>
   </div>
 </template>
@@ -44,7 +35,6 @@ import { useRouter } from 'vue-router'
 
 import AlgorithmSwitch from '@/components/AlgorithmSwitch.vue'
 import AppHeader from '@/components/AppHeader.vue'
-import ImagePreview from '@/components/ImagePreview.vue'
 import ImageUploader from '@/components/ImageUploader.vue'
 import { useHistogramStore } from '@/stores/histogram'
 
@@ -59,9 +49,12 @@ function handleImageRemoved() {
   store.removeImage()
 }
 
+function handleCropChanged(rect) {
+  store.setCropRect(rect)
+}
+
 async function handleStart() {
   const success = await store.startAnalysis()
-
   if (success) {
     router.push('/result')
   }
@@ -72,19 +65,11 @@ async function handleStart() {
 .page {
   min-height: 100vh;
   padding: 16px;
-  max-width: 1200px;
+  max-width: 780px;
   margin: 0 auto;
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: minmax(300px, 0.95fr) minmax(360px, 1.05fr);
-  gap: 16px;
-  align-items: start;
-}
-
-.left-column,
-.right-column {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -92,7 +77,7 @@ async function handleStart() {
 
 .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .actions .el-button {
@@ -100,11 +85,7 @@ async function handleStart() {
   border-radius: 10px;
 }
 
-@media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
+@media (max-width: 600px) {
   .actions .el-button {
     width: 100%;
   }
