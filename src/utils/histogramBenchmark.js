@@ -26,14 +26,20 @@ export const BENCHMARK_CONFIGS = [
     grayStrategy: 'directGray',
     loopMode: 'normalLoop',
     dataMode: 'histArray',
-    threadMode: 'mainThread',
-    benchmarkOnly: true
+    threadMode: 'mainThread'
   },
   {
     grayMode: 'floatGray',
     grayStrategy: 'directGray',
     loopMode: 'normalLoop',
     dataMode: 'histTypedArray',
+    threadMode: 'mainThread'
+  },
+  {
+    grayMode: 'floatGray',
+    grayStrategy: 'lookupGray',
+    loopMode: 'normalLoop',
+    dataMode: 'histArray',
     threadMode: 'mainThread'
   },
   {
@@ -55,6 +61,13 @@ export const BENCHMARK_CONFIGS = [
     grayMode: 'floatGray',
     grayStrategy: 'directGray',
     loopMode: 'unroll4',
+    dataMode: 'histArray',
+    threadMode: 'mainThread'
+  },
+  {
+    grayMode: 'floatGray',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
     dataMode: 'histTypedArray',
     threadMode: 'mainThread'
   },
@@ -70,8 +83,22 @@ export const BENCHMARK_CONFIGS = [
     grayMode: 'floatGray',
     grayStrategy: 'lookupGray',
     loopMode: 'unroll4',
+    dataMode: 'histArray',
+    threadMode: 'mainThread'
+  },
+  {
+    grayMode: 'floatGray',
+    grayStrategy: 'lookupGray',
+    loopMode: 'unroll4',
     dataMode: 'histTypedArray',
     threadMode: 'mainThread'
+  },
+  {
+    grayMode: 'floatGray',
+    grayStrategy: 'directGray',
+    loopMode: 'unroll4',
+    dataMode: 'histArray',
+    threadMode: 'singleWorker'
   },
   {
     grayMode: 'floatGray',

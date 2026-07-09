@@ -36,14 +36,15 @@ gray = Math.round(red * 0.299 + green * 0.587 + blue * 0.114)
 
 - 灰度策略：`directGray`、`lookupGray`
 - 遍历策略：`normalLoop`、`unroll4`
-- 数据结构：固定 `histTypedArray`
+- 数据结构：`histArray`、`histTypedArray`
 - 线程策略：`mainThread`、`singleWorker`、`chunkWorker`、`fixed2Worker`、`fixed4Worker`
 
 仍作为对照项、不参与自动选择：
 
-- `histArray`
 - `unroll2`
 - `unroll8`
+
+当前版本已把 `histArray` 重新纳入自动候选，并额外展示多组普通数组与 TypedArray 对照结果，便于观察数据结构维度对当前图片的实际影响。
 
 ## 每张图片最快正确组合
 
@@ -69,7 +70,7 @@ gray = Math.round(red * 0.299 + green * 0.587 + blue * 0.114)
 | chunkWorker-directGray-unroll4-histTypedArray-chunk32768 | 127.013ms | 2.300ms | 754.200ms | 是 | 是 |
 | mainThread-directGray-unroll4-histTypedArray | 128.217ms | 1.000ms | 784.800ms | 是 | 是 |
 | singleWorker-directGray-unroll4-histTypedArray | 136.347ms | 2.000ms | 781.400ms | 是 | 是 |
-| mainThread-directGray-normalLoop-histArray | 124.900ms | 1.100ms | 751.800ms | 否，对照项 | 是 |
+| mainThread-directGray-normalLoop-histArray | 124.900ms | 1.100ms | 751.800ms | 是 | 是 |
 | mainThread-directGray-unroll2-histTypedArray | 135.857ms | 1.100ms | 799.600ms | 否，对照项 | 是 |
 | mainThread-directGray-unroll8-histTypedArray | 138.787ms | 0.900ms | 890.300ms | 否，对照项 | 是 |
 

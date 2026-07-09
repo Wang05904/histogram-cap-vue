@@ -52,7 +52,12 @@ gray = Math.round(red * 0.299 + green * 0.587 + blue * 0.114)
 
 ## 数据结构维度结论
 
-`histArray` 与 `histTypedArray` 在测试中没有稳定单边优势：部分图片 `histArray` 略快，部分图片 `histTypedArray` 略快。考虑到 `Uint32Array(256)` 内存结构固定、与 Worker 结果合并更清晰、返回类型更稳定，自动最快候选固定使用 `histTypedArray`。`histArray` 只作为 benchmark 对照项保留。
+`histArray` 与 `histTypedArray` 在测试中没有稳定单边优势：部分图片 `histArray` 略快，部分图片 `histTypedArray` 略快。为了让页面展示和自动选择更完整，当前版本把数据结构也纳入自动最快候选。
+
+- `histArray`：普通 `Array(256)`，实现直观，部分主线程组合可能有较低开销。
+- `histTypedArray`：`Uint32Array(256)`，内存结构固定，与 Worker 输出和合并更清晰。
+
+自动最快会同时比较这两类数据结构，但仍然要求结果与基准算法完全一致。
 
 ## 自动候选维度选择
 
@@ -65,11 +70,11 @@ gray = Math.round(red * 0.299 + green * 0.587 + blue * 0.114)
 | 灰度公式 | 固定标准公式 | 必须使用 `Math.round(red * 0.299 + green * 0.587 + blue * 0.114)` |
 | 灰度计算策略 | `directGray` / `lookupGray` | 直接公式与精确查表，二者都必须与基准完全一致 |
 | 遍历策略 | `normalLoop` / `unroll4` | 普通循环与展开 4 像素 |
-| 数据结构 | 固定 `histTypedArray` | `histArray` 仅作为 benchmark 对照 |
+| 数据结构 | `histArray` / `histTypedArray` | 普通数组与 TypedArray 都参与自动选择 |
 | 线程策略 | `mainThread` / `singleWorker` / `chunkWorker` / `fixed2Worker` / `fixed4Worker` | 让单线程、分块和多 Worker 都参与自动比较 |
 | 渲染数据 | 不作为 benchmark 维度 | 自动选择阶段不再测试 `includeImageData`，避免渲染数据生成干扰算法选择 |
 
-因此自动最快不是从所有展示行中选择，而是从“正确且有实际价值”的候选子集里选择。性能对比表中其余组合用于证明测试过程和取舍依据。
+因此自动最快不是从所有展示行中选择，而是从“正确且有实际价值”的候选子集里选择。当前性能对比表会展示更多数据结构组合，例如 `directGray + normalLoop + histArray`、`lookupGray + unroll4 + histArray` 和 `singleWorker + histArray`，便于答辩时解释数据结构维度的影响。
 
 ## 自动最快选择逻辑
 
@@ -78,7 +83,7 @@ gray = Math.round(red * 0.299 + green * 0.587 + blue * 0.114)
 1. 对当前图片运行 `benchmarkHistogramAlgorithms()`。
 2. 丢弃第一次冷启动结果，每个组合统计 5 次平均耗时。
 3. 对每个组合记录计算耗时、归一化耗时、数据生成耗时、平均耗时、最小耗时、最大耗时和正确性。
-4. 过滤掉 `benchmarkOnly` 对照组合，例如 `histArray`、`unroll2`、`unroll8`。
+4. 过滤掉 `benchmarkOnly` 对照组合，例如 `unroll2`、`unroll8`。
 5. 只保留与基准算法 256 个 bin 完全一致的组合，即 `sameAsBaseline === true`。
 6. 从剩余候选中选择平均耗时最短者。
 7. 使用该组合重新生成当前图片的直方图，并把算法名称、耗时和正确性结果返回给页面展示。
@@ -87,8 +92,7 @@ gray = Math.round(red * 0.299 + green * 0.587 + blue * 0.114)
 
 ## 已测试但未作为自动候选的方向
 
-- `histArray`：收益不稳定，降级为对照。
-- `unroll2` / `unroll8`：没有稳定优于保留方案。
+- `unroll2` / `unroll8`：没有稳定优于保留方案，保留为对照项。
 - `includeImageData`：已从 benchmark 组合中删除。自动最快只比较直方图统计与归一化，页面需要绘制时再生成或使用 `normalizedBins`。
 
 ## 结果保存与异常提示
