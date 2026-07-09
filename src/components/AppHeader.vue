@@ -2,7 +2,7 @@
   <header class="app-header">
     <div class="brand">
       <div class="brand-mark">
-        <span class="mark-text">H</span>
+        <img src="/src/assets/logo.png" alt="logo" style="width: 100%; height: 100%;" />
       </div>
       <div>
         <h1>图像直方图性能分析系统</h1>
